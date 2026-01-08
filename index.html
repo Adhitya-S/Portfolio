@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-[#0B101B] text-white overflow-x-hidden antialiased selection:bg-cyan-500 selection:text-white">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adhitya S | Software Developer & AI Engineer</title>
+    <meta name="description" content="Portfolio of Adhitya S - Building scalable software systems infused with Artificial Intelligence.">
+
+    <!-- Favicon / Chrome Tab Icon -->
+    <link rel="icon" type="image/png" href="assets\1-1-logo.png">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Manrope', 'sans-serif'],
+                        display: ['Syne', 'sans-serif'],
+                    },
+                    colors: {
+                        obsidian: '#0B101B', /* Deep Midnight Navy */
+                        charcoal: '#151B2B',
+                        glass: 'rgba(30, 41, 59, 0.4)',
+                        accent: '#38BDF8', /* Sky Blue Accent */
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                        'noise': "url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.05%22/%3E%3C/svg%3E')",
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Utilities */
+        body { cursor: none; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        
+        /* Custom Cursor */
+        .cursor-dot {
+            width: 8px; height: 8px; background-color: #38BDF8;
+            position: fixed; top: 0; left: 0; z-index: 9999;
+            border-radius: 50%; pointer-events: none; 
+            box-shadow: 0 0 10px #38BDF8;
+        }
+        .cursor-outline {
+            width: 40px; height: 40px; border: 1px solid rgba(56, 189, 248, 0.5);
+            position: fixed; top: 0; left: 0; z-index: 9998;
+            border-radius: 50%; pointer-events: none;
+            transition: width 0.3s, height 0.3s, background-color 0.3s;
+            transform: translate(-50%, -50%);
+        }
+        body.hover-active .cursor-outline {
+            width: 60px; height: 60px;
+            background-color: rgba(56, 189, 248, 0.1);
+            border-color: transparent; backdrop-filter: blur(2px);
+        }
+
+        /* Smooth Scroll */
+        html { scroll-behavior: smooth; }
+
+        /* Fallback */
+        .img-fallback-active {
+            display: flex; align-items: center; justify-content: center;
+            background: #151B2B; color: #94A3B8; font-family: 'Manrope', sans-serif;
+            font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Enhanced Glass Cards */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.3);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Subtle Gradient Background for Sections */
+        .bg-glow {
+            background: radial-gradient(circle at center, rgba(56, 189, 248, 0.08) 0%, transparent 70%);
+        }
+    </style>
+</head>
+<body class="bg-obsidian relative text-slate-200">
+
+    <!-- NOISE OVERLAY -->
+    <div class="fixed inset-0 z-[1] pointer-events-none bg-noise opacity-20 mix-blend-overlay"></div>
+
+    <!-- CURSOR -->
+    <div class="cursor-dot hidden md:block"></div>
+    <div class="cursor-outline hidden md:block"></div>
+
+    <!-- THREE.JS CANVAS (Background) -->
+    <div id="canvas-container" class="fixed inset-0 z-0 opacity-100 pointer-events-none mix-blend-screen"></div>
+
+    <!-- NAVIGATION -->
+    <nav class="fixed top-0 w-full z-50 px-6 py-6 flex justify-between items-center backdrop-blur-sm bg-obsidian/50 border-b border-white/5">
+        <a href="#home" class="hover-trigger group flex items-center gap-3">
+            <!-- Logo Added Here -->
+            <img src="assets\1-1-logo.png" alt="Logo" class="w-10 h-10 object-contain rounded-full border border-white/10 p-1 bg-white/5">
+            
+            <div class="relative">
+                <span class="font-display font-bold text-xl tracking-tighter text-white">ADHITYA S</span>
+                <span class="absolute -bottom-1 left-0 w-0 h-[1px] bg-cyan-400 transition-all duration-300 group-hover:w-full"></span>
+            </div>
+        </a>
+
+        <div class="hidden md:flex gap-10 text-xs font-medium tracking-widest text-slate-400">
+            <a href="#services" class="hover:text-cyan-400 transition-colors hover-trigger">SERVICES</a>
+            <a href="#projects" class="hover:text-cyan-400 transition-colors hover-trigger">WORK</a>
+            <a href="#experience" class="hover:text-cyan-400 transition-colors hover-trigger">EXPERIENCE</a>
+        </div>
+
+        <a href="mailto:adhityavalli@gmail.com" class="hover-trigger group flex items-center gap-2">
+            <span class="text-xs font-bold tracking-widest uppercase hidden md:block group-hover:mr-2 transition-all text-white">Hire Me</span>
+            <div class="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center bg-white text-black transition-all group-hover:scale-110 group-hover:bg-cyan-400">
+                <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+            </div>
+        </a>
+    </nav>
+
+    <!-- SECTION 1: HERO -->
+    <section id="home" data-scene="core" class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden px-6 bg-glow">
+        <div class="container mx-auto z-10 grid lg:grid-cols-12 gap-8 items-center h-full">
+            
+            <div class="lg:col-span-8 flex flex-col justify-center">
+                <!-- Status Badge -->
+                <div class="w-fit mb-8 overflow-hidden">
+                    <div class="animate-reveal-y flex items-center gap-2 px-3 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 backdrop-blur-sm">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                        </span>
+                        <span class="text-[10px] font-bold tracking-[0.2em] text-cyan-300">OPEN TO WORK</span>
+                    </div>
+                </div>
+
+                <h1 class="font-display text-6xl md:text-8xl lg:text-9xl font-bold leading-[0.9] tracking-tighter mb-8 text-white">
+                    <div class="overflow-hidden"><span class="block animate-text-reveal">SOFTWARE &</span></div>
+                    <div class="overflow-hidden"><span class="block text-slate-500 animate-text-reveal" style="animation-delay: 0.1s">AI ENGINEER</span></div>
+                </h1>
+
+                <div class="flex flex-col md:flex-row gap-8 md:items-end">
+                    <p class="text-slate-400 max-w-md text-base md:text-lg leading-relaxed font-light backdrop-blur-sm border-l-2 border-cyan-500/50 pl-6">
+                        Architecting the digital future. I bridge the gap between <span class="text-cyan-300 font-medium">Robust Development</span> and <span class="text-cyan-300 font-medium">Generative AI</span> to build scalable systems that think.
+                    </p>
+                    
+                    <!-- HERO SOCIAL ICONS -->
+                    <div class="flex gap-4">
+                        <!-- Github -->
+                        <a href="https://github.com/Adhitya-S" target="_blank" class="hover-trigger w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300 hover:border-white group" aria-label="GitHub">
+                            <i data-lucide="github" class="w-5 h-5"></i>
+                            <span class="absolute -bottom-8 opacity-0 group-hover:opacity-100 text-[10px] tracking-widest transition-opacity text-white">CODE</span>
+                        </a>
+                        
+                        <!-- LinkedIn -->
+                        <a href="https://www.linkedin.com/in/adhitya-s-a4511912b" target="_blank" class="hover-trigger w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-[#0077b5] hover:border-[#0077b5] hover:text-white transition-all duration-300 group" aria-label="LinkedIn">
+                            <i data-lucide="linkedin" class="w-5 h-5"></i>
+                            <span class="absolute -bottom-8 opacity-0 group-hover:opacity-100 text-[10px] tracking-widest transition-opacity text-white">LINK</span>
+                        </a>
+
+                        <!-- Mail -->
+                        <a href="mailto:adhityavalli@gmail.com" class="hover-trigger w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-emerald-500 hover:border-emerald-500 hover:text-white transition-all duration-300 group" aria-label="Email">
+                            <i data-lucide="mail" class="w-5 h-5"></i>
+                            <span class="absolute -bottom-8 opacity-0 group-hover:opacity-100 text-[10px] tracking-widest transition-opacity text-white">MAIL</span>
+                        </a>
+
+                        <!-- Resume -->
+                        <a href="https://drive.google.com/file/d/1LStGlxHiiZdg6tKpXLkXlldL_6kgsDOf/view?usp=sharing" class="hover-trigger w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:bg-purple-500 hover:border-purple-500 hover:text-white transition-all duration-300 group" aria-label="Resume">
+                            <i data-lucide="file-text" class="w-5 h-5"></i>
+                            <span class="absolute -bottom-8 opacity-0 group-hover:opacity-100 text-[10px] tracking-widest transition-opacity text-white">CV</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3D Anchor -->
+            <div class="lg:col-span-4 h-full hidden lg:flex items-center justify-center relative pointer-events-none">
+                <!-- Sphere renders here -->
+            </div>
+        </div>
+        
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50 animate-bounce text-cyan-400">
+            <span class="text-[10px] tracking-widest uppercase">Scroll</span>
+            <i data-lucide="arrow-down" class="w-4 h-4"></i>
+        </div>
+    </section>
+
+    <!-- SECTION 2: SERVICES (Wave Background) -->
+    <section id="services" data-scene="wave" class="py-32 px-6 relative z-10">
+        <div class="absolute inset-0 bg-gradient-to-b from-obsidian via-transparent to-obsidian z-[-1]"></div>
+
+        <div class="container mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-20 border-b border-white/10 pb-10">
+                <h2 class="text-4xl md:text-6xl font-display font-bold text-white">
+                    CORE<br><span class="text-cyan-400">COMPETENCIES</span>
+                </h2>
+                <div class="text-right mt-6 md:mt-0">
+                    <p class="text-xs font-bold tracking-widest text-cyan-400 mb-2">/// EXPERTISE</p>
+                    <p class="text-sm text-slate-400 max-w-xs">Delivering enterprise-grade software with intelligent backends.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6">
+                <!-- Large Card -->
+                <div class="md:col-span-2 glass-panel rounded-2xl p-8 md:p-12 transition-all duration-500 group hover-trigger relative overflow-hidden hover:border-cyan-500/30 hover:shadow-[0_0_30px_rgba(6,182,212,0.1)]">
+                    <div class="absolute top-0 right-0 p-8 opacity-20 group-hover:opacity-100 transition-opacity duration-500 group-hover:scale-110 transform">
+                        <i data-lucide="code-2" class="w-32 h-32 text-cyan-500"></i>
+                    </div>
+                    
+                    <div class="relative z-10 h-full flex flex-col justify-between">
+                        <div>
+                            <span class="inline-block px-3 py-1 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-[10px] tracking-widest mb-6 text-cyan-400">PRIMARY FOCUS</span>
+                            <h3 class="text-3xl font-display font-bold mb-4 text-white">Full Stack Engineering</h3>
+                            <p class="text-slate-400 leading-relaxed max-w-md">End-to-end application & website development. From designing robust APIs to crafting pixel-perfect, interactive frontends using React, Next.js, and Node.js.</p>
+                        </div>
+                        <ul class="flex gap-4 mt-8 pt-8 border-t border-white/5 text-xs font-mono text-slate-500">
+                            <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 bg-cyan-400 rounded-full"></div> REACT</li>
+                            <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 bg-cyan-400 rounded-full"></div> NODE</li>
+                            <li class="flex items-center gap-2"><div class="w-1.5 h-1.5 bg-cyan-400 rounded-full"></div> ARCHITECTURE</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Tall Card -->
+                <div class="glass-panel rounded-2xl p-8 transition-all duration-500 group hover-trigger flex flex-col justify-between relative overflow-hidden hover:border-cyan-500/30 hover:shadow-[0_0_30px_rgba(6,182,212,0.1)]">
+                    <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-all"></div>
+                    <i data-lucide="brain-circuit" class="w-10 h-10 text-cyan-400 mb-6"></i>
+                    
+                    <div>
+                        <h3 class="text-2xl font-display font-bold mb-4 text-white">AI Integration</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-6">Embedding intelligence into software. RAG pipelines, LLM fine-tuning, and predictive analytics.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-[10px] border border-white/10 px-2 py-1 rounded text-slate-500">Python</span>
+                            <span class="text-[10px] border border-white/10 px-2 py-1 rounded text-slate-500">TensorFlow</span>
+                            <span class="text-[10px] border border-white/10 px-2 py-1 rounded text-slate-500">NLP</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Wide Card -->
+                <div class="glass-panel rounded-2xl p-8 transition-all duration-500 group hover-trigger flex flex-col justify-between hover:border-cyan-500/30 hover:shadow-[0_0_30px_rgba(6,182,212,0.1)]">
+                    <i data-lucide="database" class="w-10 h-10 text-cyan-400 mb-6"></i>
+                    <div>
+                        <h3 class="text-2xl font-display font-bold mb-2 text-white">Data Systems</h3>
+                        <p class="text-slate-400 text-sm">Optimized database structures (SQL/NoSQL) ensuring speed and reliability at scale.</p>
+                    </div>
+                </div>
+
+                <!-- Image/Visual Card -->
+                <div class="md:col-span-2 glass-panel rounded-2xl p-8 md:p-12 transition-all duration-500 group relative overflow-hidden flex items-center hover:border-cyan-500/30 hover:shadow-[0_0_30px_rgba(6,182,212,0.1)]">
+                    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center opacity-20 group-hover:opacity-40 transition-all duration-700 grayscale group-hover:grayscale-0"></div>
+                    <div class="relative z-10">
+                         <h3 class="text-3xl font-display font-bold mb-2 text-white">Problem Solving</h3>
+                         <p class="text-slate-300">Turning complex requirements into clean, maintainable code.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: PROJECTS (Construct Background) -->
+    <section id="projects" data-scene="construct" class="py-32 px-6 relative z-10">
+        <div class="container mx-auto">
+            <!-- REFACTORED HEADER -->
+            <h2 class="text-6xl md:text-8xl font-display font-bold text-center leading-none text-white mb-20 select-none drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                FEATURED WORK
+            </h2>
+
+            <div class="space-y-32">
+                
+                <!-- Project 1: EDUINX -->
+                <div class="project-card grid md:grid-cols-2 gap-10 md:gap-20 items-center group">
+                    <div class="order-2 md:order-1 glass-panel p-8 rounded-xl border-none bg-transparent md:glass-panel">
+                        <div class="text-orange-400 font-mono text-xs tracking-widest mb-4">01 / ED-TECH PLATFORM</div>
+                        <h3 class="text-4xl md:text-5xl font-display font-bold mb-6 group-hover:translate-x-2 transition-transform duration-500 text-white">Eduinx</h3>
+                        <p class="text-slate-400 text-lg leading-relaxed mb-8">A comprehensive Learning Management System designed for modern education. Features include real-time course delivery, interactive student dashboards, and seamless content streaming.</p>
+                        <div class="flex gap-3 mb-8">
+                            <span class="px-4 py-2 border border-white/10 rounded-full text-xs font-bold text-slate-300">REACT</span>
+                            <span class="px-4 py-2 border border-white/10 rounded-full text-xs font-bold text-slate-300">NODE.JS</span>
+                            <span class="px-4 py-2 border border-white/10 rounded-full text-xs font-bold text-slate-300">MONGODB</span>
+                        </div>
+                        <div class="flex items-center gap-6">
+                            <a href="https://eduinx.com/" class="hover-trigger inline-flex items-center gap-2 text-white border-b border-white pb-1 hover:text-orange-400 hover:border-orange-400 transition-colors">
+                                View Project <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </a>
+                            <a href="https://eduinx.com/" class="hover-trigger inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-orange-500 hover:border-orange-500 hover:text-white transition-all text-xs font-bold tracking-widest uppercase">
+                                <i data-lucide="external-link" class="w-3 h-3"></i> Live Link
+                            </a>
+                        </div>
+                    </div>
+                    <div class="order-1 md:order-2 overflow-hidden rounded-lg aspect-[4/3] relative shadow-2xl border border-white/10 bg-[#151B2B]">
+                        <a href="https://eduinx.com/" class="block w-full h-full">
+                            <img src="assets/projects/eduinx.png" alt="Eduinx" class="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105" onerror="this.onerror=null; this.parentElement.parentElement.classList.add('img-fallback-active'); this.parentElement.parentElement.innerHTML='<span>Eduinx Dashboard Preview</span>';">
+                        </a>
+                        <div class="absolute inset-0 bg-transparent transition-colors"></div>
+                    </div>
+                </div>
+
+                <!-- Project 2: ASV REMEDIES -->
+                <div class="project-card grid md:grid-cols-2 gap-10 md:gap-20 items-center group">
+                    <div class="overflow-hidden rounded-lg aspect-[4/3] relative shadow-2xl border border-white/10 bg-[#151B2B]">
+                         <a href="https://www.asvremedies.in/" class="block w-full h-full">
+                            <img src="assets/projects/asv.png" alt="ASV Remedies" class="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105" onerror="this.onerror=null; this.parentElement.parentElement.classList.add('img-fallback-active'); this.parentElement.parentElement.innerHTML='<span>ASV Remedies Preview</span>';">
+                        </a>
+                        <div class="absolute inset-0 bg-transparent transition-colors"></div>
+                    </div>
+                    <div class="glass-panel p-8 rounded-xl border-none bg-transparent md:glass-panel">
+                        <div class="text-green-400 font-mono text-xs tracking-widest mb-4">02 / HEALTHCARE SYSTEMS</div>
+                        <h3 class="text-4xl md:text-5xl font-display font-bold mb-6 group-hover:translate-x-2 transition-transform duration-500 text-white">ASV Remedies</h3>
+                        <p class="text-slate-400 text-lg leading-relaxed mb-8">Digital transformation solution for pharmaceutical management. A robust web platform streamlining inventory tracking, order processing, and B2B logistics for medical supplies.</p>
+                        <div class="flex gap-3 mb-8">
+                            <span class="px-4 py-2 border border-white/10 rounded-full text-xs font-bold text-slate-300">FULL STACK</span>
+                            <span class="px-4 py-2 border border-white/10 rounded-full text-xs font-bold text-slate-300">UI/UX</span>
+                            <span class="px-4 py-2 border border-white/10 rounded-full text-xs font-bold text-slate-300">DATABASE</span>
+                        </div>
+                        <div class="flex items-center gap-6">
+                            <a href="https://www.asvremedies.in/" class="hover-trigger inline-flex items-center gap-2 text-white border-b border-white pb-1 hover:text-green-400 hover:border-green-400 transition-colors">
+                                View Project <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </a>
+                            <a href="https://www.asvremedies.in/" class="hover-trigger inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-green-500 hover:border-green-500 hover:text-white transition-all text-xs font-bold tracking-widest uppercase">
+                                <i data-lucide="external-link" class="w-3 h-3"></i> Live Link
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 3: BRAINWAVE -->
+                <div class="project-card grid md:grid-cols-2 gap-10 md:gap-20 items-center group">
+                    <div class="order-2 md:order-1 glass-panel p-8 rounded-xl border-none bg-transparent md:glass-panel">
+                        <div class="text-emerald-400 font-mono text-xs tracking-widest mb-4">03 / AI SAAS</div>
+                        <h3 class="text-4xl md:text-5xl font-display font-bold mb-6 group-hover:translate-x-2 transition-transform duration-500 text-white">BrainWave</h3>
+                        <p class="text-slate-400 text-lg leading-relaxed mb-8">High-performance AI web app with real-time Python backend interaction. Designed to bridge the gap between complex ML models and user-friendly interfaces.</p>
+                        <div class="flex gap-3 mb-8">
+                            <span class="px-4 py-2 border border-white/10 rounded-full text-xs font-bold text-slate-300">REACT</span>
+                            <span class="px-4 py-2 border border-white/10 rounded-full text-xs font-bold text-slate-300">PYTHON</span>
+                            <span class="px-4 py-2 border border-white/10 rounded-full text-xs font-bold text-slate-300">FASTAPI</span>
+                        </div>
+                        <div class="flex items-center gap-6">
+                            <a href="https://brainwave02.vercel.app/" class="hover-trigger inline-flex items-center gap-2 text-white border-b border-white pb-1 hover:text-emerald-400 hover:border-emerald-400 transition-colors">
+                                View Project <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </a>
+                            <a href="https://brainwave02.vercel.app/" class="hover-trigger inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-emerald-500 hover:border-emerald-500 hover:text-white transition-all text-xs font-bold tracking-widest uppercase">
+                                <i data-lucide="external-link" class="w-3 h-3"></i> Live Link
+                            </a>
+                        </div>
+                    </div>
+                    <div class="order-1 md:order-2 overflow-hidden rounded-lg aspect-[4/3] relative shadow-2xl border border-white/10 bg-[#151B2B]">
+                         <a href="https://brainwave02.vercel.app/" class="block w-full h-full">
+                            <img src="assets/projects/brainwave.png" alt="BrainWave" class="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105" onerror="this.onerror=null; this.parentElement.parentElement.classList.add('img-fallback-active'); this.parentElement.parentElement.innerHTML='<span>BrainWave UI Preview</span>';">
+                        </a>
+                        <div class="absolute inset-0 bg-transparent transition-colors"></div>
+                    </div>
+                </div>
+
+                <!-- More Projects Grid (Small) -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-20">
+                    <div class="glass-panel p-6 rounded-lg transition-all hover-trigger group hover:bg-white/5 hover:border-purple-400/30 flex flex-col h-full">
+                        <h4 class="font-bold text-xl mb-2 group-hover:text-purple-400 transition-colors text-white">Diabetes Risk GUI</h4>
+                        <p class="text-xs text-slate-500 mb-4">Interactive prediction tool using Streamlit & TensorFlow.</p>
+                        <div class="w-full h-32 bg-charcoal rounded overflow-hidden flex items-center justify-center mb-4">
+                             <img src="assets/projects/diab.png" class="w-full h-full object-contain" onerror="this.style.display='none';">
+                        </div>
+                        <a href="https://diabetes-predictor-24.streamlit.app/" class="mt-auto hover-trigger inline-flex items-center gap-2 px-3 py-1.5 rounded bg-white/5 border border-white/10 hover:bg-purple-500 hover:border-purple-500 hover:text-white transition-all text-[10px] font-bold tracking-widest uppercase justify-center">
+                            <i data-lucide="external-link" class="w-3 h-3"></i> Visit Link
+                        </a>
+                    </div>
+                    <div class="glass-panel p-6 rounded-lg transition-all hover-trigger group hover:bg-white/5 hover:border-blue-400/30 flex flex-col h-full">
+                        <h4 class="font-bold text-xl mb-2 group-hover:text-blue-400 transition-colors text-white">Credit Card Default Prediction</h4>
+                        <p class="text-xs text-slate-500 mb-4">It generates accurate predictions along with their confidence scores based on clients' financial and demographic details.</p>
+                        <div class="w-full h-32 bg-charcoal rounded overflow-hidden flex items-center justify-center mb-4">
+                             <img src="assets/projects/credit-card.png" class="w-full h-full object-contain" onerror="this.style.display='none';">
+                        </div>
+                        <a href="https://credit-card-default-prediction.streamlit.app/" class="mt-auto hover-trigger inline-flex items-center gap-2 px-3 py-1.5 rounded bg-white/5 border border-white/10 hover:bg-blue-500 hover:border-blue-500 hover:text-white transition-all text-[10px] font-bold tracking-widest uppercase justify-center">
+                            <i data-lucide="external-link" class="w-3 h-3"></i> Visit Link
+                        </a>
+                    </div>
+                    <div class="glass-panel p-6 rounded-lg transition-all hover-trigger group hover:bg-white/5 hover:border-emerald-400/30 flex flex-col h-full">
+                        <h4 class="font-bold text-xl mb-2 group-hover:text-emerald-400 transition-colors text-white">Plant Disease AI</h4>
+                        <p class="text-xs text-slate-500 mb-4">Computer vision model for detecting plant pathologies.</p>
+                        <div class="w-full h-32 bg-charcoal rounded overflow-hidden flex items-center justify-center mb-4">
+                             <img src="assets/projects/plant.png" class="w-full h-full object-contain" onerror="this.style.display='none';">
+                        </div>
+                        <a href="#" class="mt-auto hover-trigger inline-flex items-center gap-2 px-3 py-1.5 rounded bg-white/5 border border-white/10 hover:bg-emerald-500 hover:border-emerald-500 hover:text-white transition-all text-[10px] font-bold tracking-widest uppercase justify-center">
+                            <i data-lucide="external-link" class="w-3 h-3"></i> Visit Link
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 4: EXPERIENCE (Warp Background) -->
+    <section id="experience" data-scene="warp" class="py-32 px-6 relative z-10">
+        <div class="container mx-auto max-w-4xl">
+            <!-- REFACTORED HEADER -->
+            <h2 class="text-4xl md:text-6xl font-display font-bold mb-20 text-center text-white">
+                CAREER <span class="text-purple-400">HISTORY</span>
+            </h2>
+
+            <div class="relative border-l border-white/10 pl-8 space-y-16">
+                <!-- EXP 1 -->
+                <div class="relative group hover-trigger">
+                    <span class="absolute -left-[37px] top-2 w-4 h-4 rounded-full bg-obsidian border border-cyan-500 group-hover:bg-cyan-400 group-hover:scale-125 transition-all shadow-[0_0_10px_rgba(34,211,238,0.5)]"></span>
+                    <div class="glass-panel p-6 rounded-xl hover:bg-white/5 transition-colors">
+                        <div class="flex items-start gap-4 mb-4">
+                            <img src="assets/company/eduinx.png" class="w-12 h-12 rounded-lg object-contain bg-white/10 p-1" alt="eduinx Logo" onerror="this.style.display='none'">
+                            <div class="flex-1">
+                                <div class="flex flex-col md:flex-row md:items-baseline md:justify-between mb-1">
+                                    <h3 class="text-2xl font-bold text-white group-hover:text-blue-400 transition-colors">Software Developer</h3>
+                                    <span class="font-mono text-xs text-slate-500">SEP 25 - JAN 26</span>
+                                </div>
+                                <div class="text-sm font-bold tracking-widest text-slate-400">EDUINX | BANGALORE</div>
+                            </div>
+                        </div>
+                        <p class="text-slate-400 leading-relaxed">Led the end-to-end design, development, and deployment of the complete Eduinx.com website—covering UI/UX, full-site architecture, performance optimization, analytics pixel integration, and live hosting on Hostinger.</p>
+                    </div>
+                </div>
+
+                <!-- EXP 2 -->
+                <div class="relative group hover-trigger">
+                    <span class="absolute -left-[37px] top-2 w-4 h-4 rounded-full bg-obsidian border border-cyan-500 group-hover:bg-cyan-400 group-hover:scale-125 transition-all shadow-[0_0_10px_rgba(34,211,238,0.5)]"></span>
+                    <div class="glass-panel p-6 rounded-xl hover:bg-white/5 transition-colors">
+                        <div class="flex items-start gap-4 mb-4">
+                            <img src="assets/company/temenos.png" class="w-12 h-12 rounded-lg object-contain bg-white/10 p-1" alt="Temenos Logo" onerror="this.style.display='none'">
+                            <div class="flex-1">
+                                <div class="flex flex-col md:flex-row md:items-baseline md:justify-between mb-1">
+                                    <h3 class="text-2xl font-bold text-white group-hover:text-blue-400 transition-colors">AI Engineer (PACS)</h3>
+                                    <span class="font-mono text-xs text-slate-500">JUN 25 - AUG 25</span>
+                                </div>
+                                <div class="text-sm font-bold tracking-widest text-slate-400">TEMENOS | CHENNAI</div>
+                            </div>
+                        </div>
+                        <p class="text-slate-400 leading-relaxed">Built multi-LLM chatbot. Optimized response pipeline by 60%. Spearheaded the integration of generative AI models into existing banking infrastructure.</p>
+                    </div>
+                </div>
+
+                <!-- EXP 3 -->
+                <div class="relative group hover-trigger">
+                    <span class="absolute -left-[37px] top-2 w-4 h-4 rounded-full bg-obsidian border border-white/30 group-hover:bg-white group-hover:scale-125 transition-all"></span>
+                    <div class="glass-panel p-6 rounded-xl hover:bg-white/5 transition-colors">
+                        <div class="flex items-start gap-4 mb-4">
+                            <img src="assets/company/Aavaaz.png" class="w-12 h-12 rounded-lg object-contain bg-white/10 p-1" alt="Aavaaz Logo" onerror="this.style.display='none'">
+                            <div class="flex-1">
+                                <div class="flex flex-col md:flex-row md:items-baseline md:justify-between mb-1">
+                                    <h3 class="text-2xl font-bold text-white group-hover:text-purple-400 transition-colors">AI Engineer Intern</h3>
+                                    <span class="font-mono text-xs text-slate-500">DEC 24 - JAN 25</span>
+                                </div>
+                                <div class="text-sm font-bold tracking-widest text-slate-400">AAVAAZ INTL | SEATTLE, USA</div>
+                            </div>
+                        </div>
+                        <p class="text-slate-400 leading-relaxed">Fine-tuned AI for medical translations. Scalable systems integration. Worked with cross-functional teams to deploy models in a HIPAA-compliant environment.</p>
+                    </div>
+                </div>
+
+                <!-- EXP 4 -->
+                <div class="relative group hover-trigger">
+                    <span class="absolute -left-[37px] top-2 w-4 h-4 rounded-full bg-obsidian border border-white/30 group-hover:bg-white group-hover:scale-125 transition-all"></span>
+                    <div class="glass-panel p-6 rounded-xl hover:bg-white/5 transition-colors">
+                        <div class="flex items-start gap-4 mb-4">
+                            <img src="assets/company/dlk.png" class="w-12 h-12 rounded-lg object-contain bg-white/10 p-1" alt="DLK Logo" onerror="this.style.display='none'">
+                            <div class="flex-1">
+                                <div class="flex flex-col md:flex-row md:items-baseline md:justify-between mb-1">
+                                    <h3 class="text-2xl font-bold text-white group-hover:text-white transition-colors">AI Intern</h3>
+                                    <span class="font-mono text-xs text-slate-500">JUN 24 - JULY 24</span>
+                                </div>
+                                <div class="text-sm font-bold tracking-widest text-slate-400">DLK TECHNOLOGIES | CHENNAI</div>
+                            </div>
+                        </div>
+                        <p class="text-slate-400 leading-relaxed">Real-time data processing models & ML enhancement. Focused on computer vision tasks and data preprocessing pipelines.</p>
+                    </div>
+                </div>
+
+                <!-- EXP 5: Cybersecurity Intern -->
+                <div class="relative group hover-trigger">
+                    <span class="absolute -left-[37px] top-2 w-4 h-4 rounded-full bg-obsidian border border-white/30 group-hover:bg-white group-hover:scale-125 transition-all"></span>
+                    <div class="glass-panel p-6 rounded-xl hover:bg-white/5 transition-colors">
+                        <div class="flex items-start gap-4 mb-4">
+                             <img src="assets/company/pantech.png" class="w-12 h-12 rounded-lg object-contain bg-white/10 p-1" alt="Pantech Logo" onerror="this.style.display='none'">
+                            <div class="flex-1">
+                                <div class="flex flex-col md:flex-row md:items-baseline md:justify-between mb-1">
+                                    <h3 class="text-2xl font-bold text-white group-hover:text-red-400 transition-colors">Cybersecurity Intern</h3>
+                                    <span class="font-mono text-xs text-slate-500">FEB 24 - FEB 24</span>
+                                </div>
+                                <div class="text-sm font-bold tracking-widest text-slate-400">PANTECH E LEARNING | CHENNAI</div>
+                            </div>
+                        </div>
+                        <p class="text-slate-400 leading-relaxed">Assisted with threat identification and network security monitoring. Gained fundamental knowledge in securing data integrity and systems.</p>
+                    </div>
+                </div>
+
+                <!-- EXP 6: Python Intern -->
+                <div class="relative group hover-trigger">
+                    <span class="absolute -left-[37px] top-2 w-4 h-4 rounded-full bg-obsidian border border-white/30 group-hover:bg-white group-hover:scale-125 transition-all"></span>
+                    <div class="glass-panel p-6 rounded-xl hover:bg-white/5 transition-colors">
+                         <div class="flex items-start gap-4 mb-4">
+                            <img src="assets/company/uniq.png" class="w-12 h-12 rounded-lg object-contain bg-white/10 p-1" alt="Uniq Logo" onerror="this.style.display='none'">
+                            <div class="flex-1">
+                                <div class="flex flex-col md:flex-row md:items-baseline md:justify-between mb-1">
+                                    <h3 class="text-2xl font-bold text-white group-hover:text-yellow-400 transition-colors">Python Intern</h3>
+                                    <span class="font-mono text-xs text-slate-500">JAN 24 - JAN 24</span>
+                                </div>
+                                <div class="text-sm font-bold tracking-widest text-slate-400">UNIQ TECHNOLOGIES | CHENNAI</div>
+                            </div>
+                        </div>
+                        <p class="text-slate-400 leading-relaxed">Developed Python scripts for task automation and contributed to debugging processes in real-world applications.</p>
+                    </div>
+                </div>
+
+                <!-- EXP 7: Web Developer Intern -->
+                <div class="relative group hover-trigger">
+                    <span class="absolute -left-[37px] top-2 w-4 h-4 rounded-full bg-obsidian border border-white/30 group-hover:bg-white group-hover:scale-125 transition-all"></span>
+                    <div class="glass-panel p-6 rounded-xl hover:bg-white/5 transition-colors">
+                        <div class="flex items-start gap-4 mb-4">
+                            <img src="assets/company/codebind.png" class="w-12 h-12 rounded-lg object-contain bg-white/10 p-1" alt="CodeBind Logo" onerror="this.style.display='none'">
+                            <div class="flex-1">
+                                <div class="flex flex-col md:flex-row md:items-baseline md:justify-between mb-1">
+                                    <h3 class="text-2xl font-bold text-white group-hover:text-cyan-400 transition-colors">Web Developer Intern</h3>
+                                    <span class="font-mono text-xs text-slate-500">JAN 24 - JAN 24</span>
+                                </div>
+                                <div class="text-sm font-bold tracking-widest text-slate-400">CODEBIND TECHNOLOGIES | CHENNAI</div>
+                            </div>
+                        </div>
+                        <p class="text-slate-400 leading-relaxed">Built responsive web applications using React, Next.js, and Tailwind CSS. Enhanced frontend functionality and user experience.</p>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 7: LEADERSHIP -->
+    <section class="py-32 px-6 border-t border-white/5 bg-obsidian z-10 relative">
+        <div class="container mx-auto">
+            <!-- REFACTORED HEADER -->
+            <h2 class="text-4xl font-bold text-center mb-16 tracking-widest uppercase text-white drop-shadow-md">
+                Ambassador Roles
+            </h2>
+            <div class="flex flex-wrap justify-center gap-12 text-center">
+                <div class="hover-trigger group">
+                    <div class="w-20 h-20 mx-auto bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10 group-hover:bg-cyan-400 group-hover:text-black transition-all">
+                        <i data-lucide="users" class="w-8 h-8"></i>
+                    </div>
+                    <h4 class="font-bold text-lg text-white">Contributor</h4>
+                    <p class="text-xs font-mono text-slate-500">GIRLSCRIPT SUMMER OF CODE</p>
+                </div>
+                <div class="hover-trigger group">
+                    <div class="w-20 h-20 mx-auto bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10 group-hover:bg-cyan-400 group-hover:text-black transition-all">
+                        <i data-lucide="graduation-cap" class="w-8 h-8"></i>
+                    </div>
+                    <h4 class="font-bold text-lg text-white">Student Ambassador</h4>
+                    <p class="text-xs font-mono text-slate-500">LET'S UPGRADE</p>
+                </div>
+                <div class="hover-trigger group">
+                    <div class="w-20 h-20 mx-auto bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10 group-hover:bg-cyan-400 group-hover:text-black transition-all">
+                        <i data-lucide="flag" class="w-8 h-8"></i>
+                    </div>
+                    <h4 class="font-bold text-lg text-white">Campus Ambassador</h4>
+                    <p class="text-xs font-mono text-slate-500">MYGOV</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer id="contact" class="py-32 px-6 bg-[#020617] relative overflow-hidden z-10">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom,#1e293b_0%,transparent_50%)]"></div>
+        <div class="container mx-auto text-center relative z-10">
+            <p class="text-cyan-400 font-mono text-xs tracking-widest mb-6">READY TO COLLABORATE?</p>
+            <a href="mailto:adhityavalli@gmail.com" class="hover-trigger inline-block">
+                <h2 class="text-5xl md:text-9xl font-display font-bold hover:text-outline transition-all duration-300 text-white">
+                    LET'S TALK
+                </h2>
+            </a>
+            
+            <div class="flex justify-center gap-12 mt-16 flex-wrap">
+                 <a href="https://github.com/Adhitya-S" class="text-slate-400 hover:text-white transition-colors text-sm font-bold tracking-widest hover-trigger flex items-center gap-2">
+                    <i data-lucide="github" class="w-4 h-4"></i> GITHUB
+                 </a>
+                 <a href="https://www.linkedin.com/in/adhitya-s-a4511912b" class="text-slate-400 hover:text-white transition-colors text-sm font-bold tracking-widest hover-trigger flex items-center gap-2">
+                    <i data-lucide="linkedin" class="w-4 h-4"></i> LINKEDIN
+                 </a>
+                 <a href="mailto:adhityavalli@gmail.com" class="text-slate-400 hover:text-white transition-colors text-sm font-bold tracking-widest hover-trigger flex items-center gap-2">
+                    <i data-lucide="mail" class="w-4 h-4"></i> EMAIL
+                 </a>
+                 <a href="https://drive.google.com/file/d/1LStGlxHiiZdg6tKpXLkXlldL_6kgsDOf/view?usp=sharing" class="text-slate-400 hover:text-white transition-colors text-sm font-bold tracking-widest hover-trigger flex items-center gap-2">
+                    <i data-lucide="file-text" class="w-4 h-4"></i> RESUME
+                 </a>
+            </div>
+
+            <p class="text-slate-600 mt-20 text-[10px] font-mono">
+                ENGINEERED BY ADHITYA S © 2026. ALL RIGHTS RESERVED.
+            </p>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script>
+        // --- 1. ICONS ---
+        lucide.createIcons();
+
+        // --- 2. CUSTOM CURSOR LOGIC ---
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorOutline = document.querySelector('.cursor-outline');
+        const triggers = document.querySelectorAll('.hover-trigger');
+
+        window.addEventListener('mousemove', (e) => {
+            const posX = e.clientX;
+            const posY = e.clientY;
+            cursorDot.style.left = `${posX}px`;
+            cursorDot.style.top = `${posY}px`;
+            cursorOutline.animate({
+                left: `${posX}px`,
+                top: `${posY}px`
+            }, { duration: 500, fill: "forwards" });
+        });
+
+        triggers.forEach(trigger => {
+            trigger.addEventListener('mouseenter', () => document.body.classList.add('hover-active'));
+            trigger.addEventListener('mouseleave', () => document.body.classList.remove('hover-active'));
+        });
+
+        // --- 3. THREE.JS SCENE MANAGER ---
+        const initThreeJS = () => {
+            const container = document.getElementById('canvas-container');
+            const scene = new THREE.Scene();
+            
+            // Fog for depth (Updated to match new Navy background)
+            scene.fog = new THREE.FogExp2(0x0B101B, 0.02);
+
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+            camera.position.z = 25;
+
+            // --- GROUPS FOR EACH SECTION ---
+            const heroGroup = new THREE.Group();
+            const waveGroup = new THREE.Group();
+            const constructGroup = new THREE.Group();
+            const warpGroup = new THREE.Group();
+
+            // Initial Visibility
+            heroGroup.visible = true;
+            waveGroup.visible = false;
+            constructGroup.visible = false;
+            warpGroup.visible = false;
+
+            scene.add(heroGroup);
+            scene.add(waveGroup);
+            scene.add(constructGroup);
+            scene.add(warpGroup);
+
+            // -------------------------------------------------------------
+            // 1. HERO SCENE: THE LIQUID CORE (Brighter for visibility)
+            // -------------------------------------------------------------
+            const geometry = new THREE.IcosahedronGeometry(10, 30);
+            const material = new THREE.MeshBasicMaterial({ 
+                color: 0xA5F3FC, // Cyan-200 tint for better visibility
+                wireframe: true,
+                transparent: true,
+                opacity: 0.3 // Increased opacity
+            });
+            const sphere = new THREE.Mesh(geometry, material);
+            heroGroup.add(sphere);
+
+            // Particles surrounding the sphere
+            const heroParticlesGeo = new THREE.BufferGeometry();
+            const heroCount = 700;
+            const heroPos = new Float32Array(heroCount * 3);
+            for(let i = 0; i < heroCount * 3; i++) heroPos[i] = (Math.random() - 0.5) * 60;
+            heroParticlesGeo.setAttribute('position', new THREE.BufferAttribute(heroPos, 3));
+            const heroParticlesMat = new THREE.PointsMaterial({ size: 0.05, color: 0xffffff, transparent: true, opacity: 0.6 });
+            const heroParticles = new THREE.Points(heroParticlesGeo, heroParticlesMat);
+            heroGroup.add(heroParticles);
+            
+            // -------------------------------------------------------------
+            // 2. SERVICES SCENE: THE NEURAL WAVE (Brighter)
+            // -------------------------------------------------------------
+            const waveGeo = new THREE.BufferGeometry();
+            const waveWidth = 50;
+            const waveDepth = 50;
+            const waveCount = waveWidth * waveDepth;
+            const wavePos = new Float32Array(waveCount * 3);
+            
+            let wIdx = 0;
+            for(let x = 0; x < waveWidth; x++) {
+                for(let z = 0; z < waveDepth; z++) {
+                    wavePos[wIdx++] = (x - waveWidth/2) * 1.5; 
+                    wavePos[wIdx++] = 0; 
+                    wavePos[wIdx++] = (z - waveDepth/2) * 1.5; 
+                }
+            }
+            waveGeo.setAttribute('position', new THREE.BufferAttribute(wavePos, 3));
+            const waveMat = new THREE.PointsMaterial({ color: 0x38BDF8, size: 0.15, transparent: true, opacity: 0.8 });
+            const waveMesh = new THREE.Points(waveGeo, waveMat);
+            waveGroup.add(waveMesh);
+            waveGroup.rotation.x = -Math.PI / 4; 
+
+            // -------------------------------------------------------------
+            // 3. PROJECTS SCENE: THE CONSTRUCT (Brighter)
+            // -------------------------------------------------------------
+            const shapes = [];
+            const geoTypes = [
+                new THREE.BoxGeometry(1,1,1),
+                new THREE.TetrahedronGeometry(1),
+                new THREE.OctahedronGeometry(1)
+            ];
+            
+            for(let i=0; i<30; i++) {
+                const geo = geoTypes[Math.floor(Math.random()*geoTypes.length)];
+                const mat = new THREE.MeshBasicMaterial({ color: 0xE2E8F0, wireframe: true, transparent: true, opacity: 0.2 });
+                const mesh = new THREE.Mesh(geo, mat);
+                
+                mesh.position.set((Math.random()-0.5)*50, (Math.random()-0.5)*30, (Math.random()-0.5)*20);
+                mesh.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, 0);
+                mesh.userData = {
+                    rotSpeedX: (Math.random()-0.5) * 0.02,
+                    rotSpeedY: (Math.random()-0.5) * 0.02,
+                    floatSpeed: (Math.random() * 0.02) + 0.01,
+                    yBase: mesh.position.y
+                };
+                constructGroup.add(mesh);
+                shapes.push(mesh);
+            }
+
+            // -------------------------------------------------------------
+            // 4. ANIMATE WARP
+            // -------------------------------------------------------------
+            const warpGeo = new THREE.BufferGeometry();
+            const warpCount = 2000;
+            const warpPos = new Float32Array(warpCount * 3);
+            for(let i=0; i<warpCount; i++) {
+                const x = (Math.random() - 0.5) * 100;
+                const y = (Math.random() - 0.5) * 100;
+                const z = (Math.random() - 0.5) * 100;
+                warpPos[i*3] = x;
+                warpPos[i*3+1] = y;
+                warpPos[i*3+2] = z;
+            }
+            warpGeo.setAttribute('position', new THREE.BufferAttribute(warpPos, 3));
+            const warpMat = new THREE.PointsMaterial({ color: 0x818CF8, size: 0.1, transparent: true, opacity: 0.9 });
+            const warpMesh = new THREE.Points(warpGeo, warpMat);
+            warpGroup.add(warpMesh);
+
+
+            // -------------------------------------------------------------
+            // ANIMATION LOOP
+            // -------------------------------------------------------------
+            const clock = new THREE.Clock();
+            let mouseX = 0, mouseY = 0;
+            let targetX = 0, targetY = 0;
+            const windowHalfX = window.innerWidth / 2;
+            const windowHalfY = window.innerHeight / 2;
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX - windowHalfX);
+                mouseY = (event.clientY - windowHalfY);
+            });
+
+            const originalPositions = geometry.attributes.position.array.slice();
+            let currentScene = 'core'; 
+
+            const animate = () => {
+                requestAnimationFrame(animate);
+                const time = clock.getElapsedTime();
+
+                // 1. ANIMATE CORE
+                if(heroGroup.visible || currentScene === 'core') {
+                    targetX = mouseX * 0.001;
+                    targetY = mouseY * 0.001;
+                    sphere.rotation.y += 0.05 * (targetX - sphere.rotation.y);
+                    sphere.rotation.x += 0.05 * (targetY - sphere.rotation.x);
+                    sphere.rotation.z += 0.002;
+                    heroParticles.rotation.y = -time * 0.05;
+
+                    const positions = geometry.attributes.position.array;
+                    for(let i = 0; i < positions.length; i += 3) {
+                        const x = originalPositions[i];
+                        const y = originalPositions[i+1];
+                        const noise = Math.sin(x * 0.5 + time) * Math.cos(y * 0.3 + time) * 0.5;
+                        const scale = 1 + noise * 0.1;
+                        positions[i] = originalPositions[i] * scale;
+                        positions[i+1] = originalPositions[i+1] * scale;
+                        positions[i+2] = originalPositions[i+2] * scale;
+                    }
+                    geometry.attributes.position.needsUpdate = true;
+                }
+
+                // 2. ANIMATE WAVE
+                if(waveGroup.visible || currentScene === 'wave') {
+                    const positions = waveGeo.attributes.position.array;
+                    let i = 0;
+                    for(let x = 0; x < waveWidth; x++) {
+                        for(let z = 0; z < waveDepth; z++) {
+                            const y = Math.sin(x * 0.2 + time) * Math.cos(z * 0.2 + time) * 2;
+                            positions[i + 1] = y;
+                            i += 3;
+                        }
+                    }
+                    waveGeo.attributes.position.needsUpdate = true;
+                }
+
+                // 3. ANIMATE CONSTRUCT
+                if(constructGroup.visible || currentScene === 'construct') {
+                    shapes.forEach(mesh => {
+                        mesh.rotation.x += mesh.userData.rotSpeedX;
+                        mesh.rotation.y += mesh.userData.rotSpeedY;
+                        mesh.position.y = mesh.userData.yBase + Math.sin(time * mesh.userData.floatSpeed) * 2;
+                    });
+                    constructGroup.rotation.y += 0.001;
+                }
+
+                // 4. ANIMATE WARP
+                if(warpGroup.visible || currentScene === 'warp') {
+                    const positions = warpGeo.attributes.position.array;
+                    for(let i=0; i<warpCount; i++) {
+                        positions[i*3+2] += 0.5; 
+                        if(positions[i*3+2] > 50) positions[i*3+2] = -50; 
+                    }
+                    warpGeo.attributes.position.needsUpdate = true;
+                    warpMesh.rotation.z -= 0.002; 
+                }
+
+                renderer.render(scene, camera);
+            };
+
+            animate();
+
+            // -------------------------------------------------------------
+            // SCENE SWITCHING LOGIC
+            // -------------------------------------------------------------
+            const observerOptions = { threshold: 0.2 };
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const sceneType = entry.target.getAttribute('data-scene');
+                        if(sceneType) {
+                            currentScene = sceneType;
+                            switchScene(sceneType);
+                        }
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('section').forEach(sec => observer.observe(sec));
+
+            function switchScene(type) {
+                fadeGroup(heroGroup, type === 'core' ? 1 : 0);
+                fadeGroup(waveGroup, type === 'wave' ? 1 : 0);
+                fadeGroup(constructGroup, type === 'construct' ? 1 : 0);
+                fadeGroup(warpGroup, type === 'warp' ? 1 : 0);
+            }
+
+            function fadeGroup(group, targetOpacity) {
+                if(targetOpacity > 0) group.visible = true;
+                group.children.forEach(child => {
+                    if(child.material) {
+                         gsap.to(child.material, {
+                             opacity: targetOpacity * (child.userData.baseOpacity || 0.4), 
+                             duration: 1,
+                             onComplete: () => {
+                                 if(targetOpacity === 0) group.visible = false;
+                             }
+                         });
+                    }
+                });
+            }
+
+            heroGroup.children.forEach(c => c.userData.baseOpacity = c.material.opacity);
+            waveGroup.children.forEach(c => c.userData.baseOpacity = c.material.opacity);
+            constructGroup.children.forEach(c => c.userData.baseOpacity = c.material.opacity);
+            warpGroup.children.forEach(c => c.userData.baseOpacity = c.material.opacity);
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+
+        // Initialize Three.js
+        initThreeJS();
+
+        // --- 4. GSAP REVEALS ---
+        gsap.registerPlugin(ScrollTrigger);
+
+        const tl = gsap.timeline();
+        tl.from(".animate-text-reveal", {
+            y: 100, opacity: 0, duration: 1.5, stagger: 0.2, ease: "power4.out"
+        })
+        .from("nav", {
+            y: -50, opacity: 0, duration: 1, ease: "power3.out"
+        }, "-=1");
+
+        gsap.utils.toArray('.glass-panel').forEach(card => {
+            gsap.from(card, {
+                scrollTrigger: { trigger: card, start: "top 85%" },
+                y: 50, opacity: 0, duration: 1, ease: "power2.out"
+            });
+        });
+
+    </script>
+</body>
+</html>
